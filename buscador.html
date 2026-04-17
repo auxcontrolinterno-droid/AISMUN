@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AISMUN</title>
+<title>Buscador AISMUN</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -29,109 +29,64 @@ max-width:340px;
 
 .container{
 background:#fff;
-width:92%;
-max-width:540px;
+width:94%;
+max-width:850px;
 margin:25px auto;
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 25px rgba(0,0,0,.08);
-text-align:left;
 }
 
 h1{
 margin:0;
-color:#0b3d91;
-font-size:32px;
+font-size:30px;
 font-weight:800;
-text-align:center;
+color:#0b3d91;
 }
 
 .sub{
-text-align:center;
 font-size:14px;
-margin-top:6px;
-margin-bottom:22px;
 color:#555;
+margin-top:6px;
+margin-bottom:20px;
 }
 
-label{
-font-size:13px;
-font-weight:700;
-display:block;
-margin-bottom:6px;
-margin-top:12px;
-}
-
-input,select{
-width:100%;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-box-sizing:border-box;
-font-size:14px;
-}
-
-input:focus,select:focus{
-outline:none;
-border-color:#0b3d91;
-box-shadow:0 0 0 2px rgba(11,61,145,.08);
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.btn{
+input{
 width:100%;
 padding:14px;
-border:none;
 border-radius:12px;
-cursor:pointer;
-font-weight:700;
+border:1px solid #ccc;
+box-sizing:border-box;
 font-size:15px;
-margin-top:14px;
+margin-bottom:18px;
 }
 
-.blue{
+table{
+width:100%;
+border-collapse:collapse;
+font-size:13px;
+}
+
+th{
 background:#0b3d91;
 color:#fff;
+padding:10px;
 }
 
-.blue:hover{
-background:#092f6f;
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+text-align:left;
 }
 
-.gray{
-background:#eef2f8;
-color:#0b3d91;
+tr:hover{
+background:#f8faff;
 }
 
-.persona{
-border:1px solid #e4e7ec;
-padding:15px;
-border-radius:14px;
-margin-top:14px;
-background:#fafbfd;
-}
-
-.mini{
+.small{
 font-size:12px;
 color:#666;
-margin-bottom:8px;
-font-weight:700;
-}
-
-.ok{
-text-align:center;
-padding:18px;
-font-weight:700;
-color:#0b3d91;
-}
-
-.hidden{
-display:none;
+margin-top:10px;
 }
 </style>
 </head>
@@ -144,154 +99,108 @@ display:none;
 
 <div class="container">
 
-<h1>AISMUN</h1>
-<div class="sub">Bienvenidos a AISMUN</div>
+<h1>BUSCADOR AISMUN</h1>
+<div class="sub">Buscar por nombre, cédula, colegio o placa</div>
 
-<label>Número de cédula del responsable</label>
-<input id="cedula">
+<input id="buscar" placeholder="Escriba para buscar..." onkeyup="filtrar()">
 
-<label>Nombre completo del responsable</label>
-<input id="nombre">
+<table id="tabla">
+<thead>
+<tr>
+<th>Grupo</th>
+<th>Tipo</th>
+<th>Cédula</th>
+<th>Nombre</th>
+<th>Institución</th>
+<th>Placa</th>
+<th>Hora</th>
+</tr>
+</thead>
+<tbody id="resultados"></tbody>
+</table>
 
-<div class="row">
-<div>
-<label>Teléfono principal</label>
-<input id="telefono">
-</div>
-
-<div>
-<label>Número de emergencia</label>
-<input id="emergencia">
-</div>
-</div>
-
-<label>Institución / Colegio</label>
-<input id="institucion">
-
-<label>¿Viene en vehículo?</label>
-<select id="vehiculo" onchange="togglePlaca()">
-<option value="NO">No</option>
-<option value="SI">Sí</option>
-</select>
-
-<div id="placaBox" class="hidden">
-<label>Placa del vehículo</label>
-<input id="placa">
-</div>
-
-<div id="acompanantes"></div>
-
-<button class="btn gray" onclick="agregarPersona()">➕ Agregar acompañante</button>
-
-<button class="btn blue" onclick="enviar()">Registrar ingreso</button>
-
-<div id="msg"></div>
+<div class="small">Actualización en tiempo real</div>
 
 </div>
 
 <script>
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby-V1uzBGMZ5fIXwRZpKw7ceyMkZ9EJ-W2nEbv8e4WpQNZLedDR2XE4_V840mfJrzLbyQ/exec";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAifzyypT1aHaX5RcTwOTPjwuA/gviz/tq?tqx=out:json";
 
-let contador = 0;
+let datos = [];
 
-function togglePlaca(){
-const v = document.getElementById("vehiculo").value;
-document.getElementById("placaBox").classList.toggle("hidden", v !== "SI");
+async function cargar(){
+
+const res = await fetch(SHEET_URL);
+const txt = await res.text();
+const json = JSON.parse(txt.substring(47).slice(0,-2));
+
+datos = json.table.rows.map(r=>{
+
+const c = (r.c || []).map(x => x ? x.v : "");
+
+return {
+grupo:c[0],
+tipo:c[1],
+cedula:c[2],
+nombre:c[3],
+institucion:c[6],
+placa:c[8],
+hora:c[9]
+};
+
+});
+
+mostrar(datos);
+
 }
 
-function agregarPersona(){
+function mostrar(lista){
 
-contador++;
+let html = "";
 
-const div = document.createElement("div");
-div.className = "persona";
+lista.forEach(x=>{
 
-div.innerHTML = `
-<div class="mini">Acompañante #${contador}</div>
-
-<label>Nombre completo</label>
-<input class="anombre">
-
-<label>Número de cédula</label>
-<input class="acedula">
+html += `
+<tr>
+<td>${x.grupo}</td>
+<td>${x.tipo}</td>
+<td>${x.cedula}</td>
+<td>${x.nombre}</td>
+<td>${x.institucion}</td>
+<td>${x.placa}</td>
+<td>${x.hora}</td>
+</tr>
 `;
 
-document.getElementById("acompanantes").appendChild(div);
-}
-
-async function enviar(){
-
-const cedula = document.getElementById("cedula").value.trim();
-const nombre = document.getElementById("nombre").value.trim();
-const telefono = document.getElementById("telefono").value.trim();
-const emergencia = document.getElementById("emergencia").value.trim();
-const institucion = document.getElementById("institucion").value.trim();
-const vehiculo = document.getElementById("vehiculo").value;
-const placa = document.getElementById("placa").value.trim();
-
-if(!cedula || !nombre || !telefono || !emergencia || !institucion){
-alert("Complete todos los campos principales");
-return;
-}
-
-const grupo = "GRP-" + Date.now();
-
-let personas = [];
-
-personas.push({
-tipo:"Responsable",
-cedula,
-nombre,
-telefono,
-emergencia,
-institucion,
-vehiculo,
-placa
 });
 
-const nombres = document.querySelectorAll(".anombre");
-const cedulas = document.querySelectorAll(".acedula");
-
-for(let i=0;i<nombres.length;i++){
-
-const n = nombres[i].value.trim();
-const c = cedulas[i].value.trim();
-
-if(n && c){
-
-personas.push({
-tipo:"Acompañante",
-cedula:c,
-nombre:n,
-telefono:"",
-emergencia:"",
-institucion,
-vehiculo,
-placa
-});
+document.getElementById("resultados").innerHTML = html;
 
 }
 
+function filtrar(){
+
+const t = document.getElementById("buscar").value.toLowerCase();
+
+const filtrados = datos.filter(x =>
+
+String(x.grupo).toLowerCase().includes(t) ||
+String(x.tipo).toLowerCase().includes(t) ||
+String(x.cedula).toLowerCase().includes(t) ||
+String(x.nombre).toLowerCase().includes(t) ||
+String(x.institucion).toLowerCase().includes(t) ||
+String(x.placa).toLowerCase().includes(t)
+
+);
+
+mostrar(filtrados);
+
 }
 
-document.getElementById("msg").innerHTML = "<div class='ok'>Registrando...</div>";
+cargar();
 
-await fetch(URL_SCRIPT,{
-method:"POST",
-body:JSON.stringify({
-grupo,
-personas
-})
-});
-
-document.getElementById("msg").innerHTML = "<div class='ok'>✅ Registro exitoso</div>";
-
-setTimeout(()=>{
-location.reload();
-},1500);
-
-}
+setInterval(cargar,10000);
 
 </script>
 

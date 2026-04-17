@@ -3,83 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AISMUN</title>
+<title>AISMUN Registro</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-body{
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
 font-family:'Inter',sans-serif;
 background:linear-gradient(135deg,#e9eef5,#dfe7f1);
-text-align:center;
+padding:15px;
 }
 
 .header{
 background:#fff;
-padding:18px 0;
-border-bottom:2px solid #0b3d91;
+padding:22px;
+border-radius:22px;
+text-align:center;
+box-shadow:0 8px 20px rgba(0,0,0,.06);
+margin-bottom:18px;
 }
 
 .header img{
-width:85%;
-max-width:340px;
+width:100%;
+max-width:520px;
+height:auto;
 }
 
 .container{
 background:#fff;
-width:92%;
-max-width:540px;
-margin:25px auto;
-padding:25px;
-border-radius:20px;
+padding:22px;
+border-radius:22px;
 box-shadow:0 10px 25px rgba(0,0,0,.08);
-text-align:left;
+max-width:620px;
+margin:auto;
 }
 
 h1{
-margin:0;
 text-align:center;
+font-size:30px;
+font-weight:800;
 color:#0b3d91;
-font-size:32px;
+margin-bottom:6px;
 }
 
 .sub{
 text-align:center;
+color:#666;
+font-size:14px;
 margin-bottom:20px;
-color:#555;
 }
 
 label{
 display:block;
+font-size:13px;
+font-weight:800;
 margin-top:12px;
 margin-bottom:6px;
-font-size:13px;
-font-weight:700;
+color:#333;
 }
 
 input,select{
 width:100%;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-box-sizing:border-box;
+padding:14px;
+border-radius:14px;
+border:1px solid #ccd4e0;
+font-size:15px;
+outline:none;
+background:#fff;
+}
+
+input:focus,select:focus{
+border-color:#0b3d91;
+box-shadow:0 0 0 4px rgba(11,61,145,.08);
 }
 
 .row{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px;
+gap:12px;
 }
 
 .btn{
 width:100%;
-padding:14px;
+padding:15px;
 border:none;
-border-radius:12px;
-font-weight:700;
-margin-top:14px;
+border-radius:14px;
+font-size:16px;
+font-weight:800;
 cursor:pointer;
+margin-top:16px;
 }
 
 .blue{
@@ -95,20 +113,36 @@ color:#0b3d91;
 .persona{
 margin-top:15px;
 padding:15px;
-border:1px solid #eee;
-border-radius:14px;
-background:#fafbfd;
+border-radius:16px;
+background:#f8fbff;
+border:1px solid #e4ebf4;
+}
+
+.ok{
+text-align:center;
+font-weight:800;
+color:#0b3d91;
+padding:14px;
 }
 
 .hidden{
 display:none;
 }
 
-.ok{
-text-align:center;
-padding:18px;
-font-weight:700;
-color:#0b3d91;
+@media(max-width:700px){
+
+.row{
+grid-template-columns:1fr;
+}
+
+h1{
+font-size:24px;
+}
+
+.header img{
+max-width:100%;
+}
+
 }
 </style>
 </head>
@@ -116,20 +150,22 @@ color:#0b3d91;
 <body>
 
 <div class="header">
-<img src="https://i.imgur.com/OB279U8.jpeg">
+<img src="https://i.ibb.co/7N0tXh7/logo-aismun.png">
 </div>
 
 <div class="container">
-
+
+<h1>REGISTRO AISMUN</h1>
 <div class="sub">Bienvenidos a AISMUN</div>
 
-<label>Cédula </label>
+<label>Cédula responsable</label>
 <input id="cedula">
 
 <label>Nombre completo</label>
 <input id="nombre">
 
 <div class="row">
+
 <div>
 <label>Teléfono</label>
 <input id="telefono">
@@ -139,6 +175,7 @@ color:#0b3d91;
 <label>Número de emergencia</label>
 <input id="emergencia">
 </div>
+
 </div>
 
 <label>Institución</label>
@@ -220,6 +257,7 @@ div.innerHTML = `
 `;
 
 document.getElementById("acompanantes").appendChild(div);
+
 }
 
 async function enviar(){
@@ -283,14 +321,16 @@ cantidadAlumnos
 
 }
 
-document.getElementById("msg").innerHTML="<div class='ok'>Registrando...</div>";
+document.getElementById("msg").innerHTML =
+"<div class='ok'>Registrando...</div>";
 
 await fetch(URL_SCRIPT,{
 method:"POST",
 body:JSON.stringify({grupo,personas})
 });
 
-document.getElementById("msg").innerHTML="<div class='ok'>✅ Registro exitoso</div>";
+document.getElementById("msg").innerHTML =
+"<div class='ok'>✅ Registro exitoso</div>";
 
 setTimeout(()=>{
 location.reload();

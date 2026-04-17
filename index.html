@@ -1,18 +1,15 @@
+<!-- index.html  (INGRESO AISMUN ACTUALIZADO CON NUEVO LOGO) -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AISMUN Registro</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
 font-family:'Inter',sans-serif;
@@ -32,7 +29,7 @@ margin-bottom:18px;
 .header img{
 width:100%;
 max-width:520px;
-height:auto;
+border-radius:18px;
 }
 
 .container{
@@ -46,26 +43,24 @@ margin:auto;
 
 h1{
 text-align:center;
-font-size:30px;
-font-weight:800;
 color:#0b3d91;
-margin-bottom:6px;
+font-size:28px;
+font-weight:800;
+margin-bottom:8px;
 }
 
 .sub{
 text-align:center;
 color:#666;
-font-size:14px;
 margin-bottom:20px;
 }
 
 label{
 display:block;
-font-size:13px;
-font-weight:800;
 margin-top:12px;
 margin-bottom:6px;
-color:#333;
+font-size:13px;
+font-weight:800;
 }
 
 input,select{
@@ -75,12 +70,6 @@ border-radius:14px;
 border:1px solid #ccd4e0;
 font-size:15px;
 outline:none;
-background:#fff;
-}
-
-input:focus,select:focus{
-border-color:#0b3d91;
-box-shadow:0 0 0 4px rgba(11,61,145,.08);
 }
 
 .row{
@@ -111,38 +100,24 @@ color:#0b3d91;
 }
 
 .persona{
-margin-top:15px;
-padding:15px;
+margin-top:14px;
+padding:14px;
 border-radius:16px;
 background:#f8fbff;
-border:1px solid #e4ebf4;
+border:1px solid #e5ebf4;
 }
+
+.hidden{display:none;}
 
 .ok{
 text-align:center;
 font-weight:800;
 color:#0b3d91;
-padding:14px;
-}
-
-.hidden{
-display:none;
+padding:15px;
 }
 
 @media(max-width:700px){
-
-.row{
-grid-template-columns:1fr;
-}
-
-h1{
-font-size:24px;
-}
-
-.header img{
-max-width:100%;
-}
-
+.row{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -150,7 +125,7 @@ max-width:100%;
 <body>
 
 <div class="header">
-<img src="https://i.ibb.co/7N0tXh7/logo-aismun.png">
+<img src="https://i.ibb.co/xKtvSvZ7/IMG-20260417-WA0011.jpg">
 </div>
 
 <div class="container">
@@ -165,7 +140,6 @@ max-width:100%;
 <input id="nombre">
 
 <div class="row">
-
 <div>
 <label>Teléfono</label>
 <input id="telefono">
@@ -175,13 +149,12 @@ max-width:100%;
 <label>Número de emergencia</label>
 <input id="emergencia">
 </div>
-
 </div>
 
 <label>Institución</label>
 <input id="institucion">
 
-<label>¿Viene en vehículo particular?</label>
+<label>¿Viene en vehículo?</label>
 <select id="vehiculo" onchange="toggleVehiculo()">
 <option value="NO">No</option>
 <option value="SI">Sí</option>
@@ -199,19 +172,16 @@ max-width:100%;
 </select>
 
 <div id="busBox" class="hidden">
-
 <label>Placa bus</label>
 <input id="placaBus">
 
 <label>Cantidad de alumnos</label>
 <input id="cantidadAlumnos" type="number">
-
 </div>
 
 <div id="acompanantes"></div>
 
 <button class="btn gray" onclick="agregarPersona()">➕ Agregar acompañante</button>
-
 <button class="btn blue" onclick="enviar()">Registrar ingreso</button>
 
 <div id="msg"></div>
@@ -219,34 +189,27 @@ max-width:100%;
 </div>
 
 <script>
+const URL_SCRIPT="https://script.google.com/macros/s/AKfycby-V1uzBGMZ5fIXwRZpKw7ceyMkZ9EJ-W2nEbv8e4WpQNZLedDR2XE4_V840mfJrzLbyQ/exec";
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby-V1uzBGMZ5fIXwRZpKw7ceyMkZ9EJ-W2nEbv8e4WpQNZLedDR2XE4_V840mfJrzLbyQ/exec";
-
-let contador = 0;
+let contador=0;
 
 function toggleVehiculo(){
-document.getElementById("placaBox").classList.toggle(
-"hidden",
-document.getElementById("vehiculo").value !== "SI"
-);
+document.getElementById("placaBox").classList.toggle("hidden",
+document.getElementById("vehiculo").value!=="SI");
 }
 
 function toggleBus(){
-document.getElementById("busBox").classList.toggle(
-"hidden",
-document.getElementById("bus").value !== "SI"
-);
+document.getElementById("busBox").classList.toggle("hidden",
+document.getElementById("bus").value!=="SI");
 }
 
 function agregarPersona(){
-
 contador++;
 
-const div = document.createElement("div");
+let div=document.createElement("div");
+div.className="persona";
 
-div.className = "persona";
-
-div.innerHTML = `
+div.innerHTML=`
 <b>Acompañante #${contador}</b>
 
 <label>Nombre completo</label>
@@ -257,87 +220,66 @@ div.innerHTML = `
 `;
 
 document.getElementById("acompanantes").appendChild(div);
-
 }
 
 async function enviar(){
 
-const cedula = document.getElementById("cedula").value.trim();
-const nombre = document.getElementById("nombre").value.trim();
-const telefono = document.getElementById("telefono").value.trim();
-const emergencia = document.getElementById("emergencia").value.trim();
-const institucion = document.getElementById("institucion").value.trim();
-const vehiculo = document.getElementById("vehiculo").value;
-const placa = document.getElementById("placa").value.trim();
-const bus = document.getElementById("bus").value;
-const placaBus = document.getElementById("placaBus").value.trim();
-const cantidadAlumnos = document.getElementById("cantidadAlumnos").value.trim();
+const cedula=document.getElementById("cedula").value.trim();
+const nombre=document.getElementById("nombre").value.trim();
+const telefono=document.getElementById("telefono").value.trim();
+const emergencia=document.getElementById("emergencia").value.trim();
+const institucion=document.getElementById("institucion").value.trim();
+const vehiculo=document.getElementById("vehiculo").value;
+const placa=document.getElementById("placa").value.trim();
+const bus=document.getElementById("bus").value;
+const placaBus=document.getElementById("placaBus").value.trim();
+const cantidadAlumnos=document.getElementById("cantidadAlumnos").value.trim();
 
-if(!cedula || !nombre || !telefono || !emergencia || !institucion){
+if(!cedula||!nombre||!telefono||!emergencia||!institucion){
 alert("Complete todos los campos");
 return;
 }
 
-const grupo = "GRP-" + Date.now();
+let grupo="GRP-"+Date.now();
 
-let personas = [];
-
-personas.push({
+let personas=[{
 tipo:"Responsable",
-cedula,
-nombre,
-telefono,
-emergencia,
-institucion,
-vehiculo,
-placa,
-bus,
-placaBus,
-cantidadAlumnos
-});
+cedula,nombre,telefono,emergencia,institucion,
+vehiculo,placa,bus,placaBus,cantidadAlumnos
+}];
 
-const nombres = document.querySelectorAll(".anombre");
-const cedulas = document.querySelectorAll(".acedula");
+document.querySelectorAll(".anombre").forEach((n,i)=>{
 
-for(let i=0;i<nombres.length;i++){
+let c=document.querySelectorAll(".acedula")[i];
 
-if(nombres[i].value.trim() && cedulas[i].value.trim()){
+if(n.value.trim()&&c.value.trim()){
 
 personas.push({
 tipo:"Acompañante",
-cedula:cedulas[i].value.trim(),
-nombre:nombres[i].value.trim(),
+cedula:c.value.trim(),
+nombre:n.value.trim(),
 telefono:"",
 emergencia:"",
 institucion,
-vehiculo,
-placa,
-bus,
-placaBus,
-cantidadAlumnos
+vehiculo,placa,bus,placaBus,cantidadAlumnos
 });
 
 }
 
-}
+});
 
-document.getElementById("msg").innerHTML =
-"<div class='ok'>Registrando...</div>";
+document.getElementById("msg").innerHTML="<div class='ok'>Registrando...</div>";
 
 await fetch(URL_SCRIPT,{
 method:"POST",
 body:JSON.stringify({grupo,personas})
 });
 
-document.getElementById("msg").innerHTML =
-"<div class='ok'>✅ Registro exitoso</div>";
+document.getElementById("msg").innerHTML="<div class='ok'>✅ Registro exitoso</div>";
 
-setTimeout(()=>{
-location.reload();
-},1500);
+setTimeout(()=>location.reload(),1500);
 
 }
-
 </script>
 
 </body>

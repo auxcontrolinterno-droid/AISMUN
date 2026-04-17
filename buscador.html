@@ -66,11 +66,6 @@ margin-bottom:18px;
 background:#f8fbff;
 }
 
-#buscar::placeholder{
-font-size:18px;
-color:#777;
-}
-
 .cards{
 display:grid;
 gap:14px;
@@ -139,13 +134,12 @@ h1{font-size:24px;}
 <h1>BUSCADOR AISMUN</h1>
 <div class="sub">Buscar por nombre, cédula, colegio, placa o bus</div>
 
-<input 
-id="buscar" 
+<input
+id="buscar"
 type="text"
 placeholder="Buscar ahora..."
 oninput="filtrar()"
-autocomplete="off"
->
+autocomplete="off">
 
 <div id="resultados" class="cards"></div>
 <div id="total" class="total"></div>
@@ -157,9 +151,31 @@ autocomplete="off"
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAifzyypT1aHaX5RcTwOTPjwuA/gviz/tq?tqx=out:json";
 
 let datos = [];
+let busquedaActual = "";
 
-function txt(v){
+function texto(v){
 return String(v || "").toLowerCase().trim();
+}
+
+function formatearHora(valor){
+
+if(typeof valor === "string" && valor.includes("Date(")){
+
+const nums = valor.match(/\d+/g);
+
+if(nums && nums.length >= 6){
+
+let h = nums[3].padStart(2,"0");
+let m = nums[4].padStart(2,"0");
+let s = nums[5].padStart(2,"0");
+
+return h + ":" + m + ":" + s;
+}
+
+}
+
+return valor || "";
+
 }
 
 async function cargar(){
@@ -175,25 +191,29 @@ datos = json.table.rows.map(r=>{
 const c = (r.c || []).map(x => x ? x.v : "");
 
 return{
-grupo: String(c[0] || ""),
-tipo: String(c[1] || ""),
-cedula: String(c[2] || ""),
-nombre: String(c[3] || ""),
-telefono: String(c[4] || ""),
-emergencia: String(c[5] || ""),
-institucion: String(c[6] || ""),
-vehiculo: String(c[7] || ""),
-placa: String(c[8] || ""),
-bus: String(c[9] || ""),
-placaBus: String(c[10] || ""),
-cantidad: String(c[11] || ""),
-hora: String(c[12] || ""),
-fecha: String(c[13] || "")
+grupo:c[0] || "",
+tipo:c[1] || "",
+cedula:c[2] || "",
+nombre:c[3] || "",
+telefono:c[4] || "",
+emergencia:c[5] || "",
+institucion:c[6] || "",
+vehiculo:c[7] || "",
+placa:c[8] || "",
+bus:c[9] || "",
+placaBus:c[10] || "",
+cantidad:c[11] || "",
+hora:formatearHora(c[12]),
+fecha:c[13] || ""
 };
 
 });
 
+if(busquedaActual !== ""){
+filtrar();
+}else{
 mostrar(datos);
+}
 
 }catch(e){
 
@@ -261,16 +281,16 @@ document.getElementById("total").innerText = "Total resultados: " + lista.length
 
 function filtrar(){
 
-const q = txt(document.getElementById("buscar").value);
+busquedaActual = texto(document.getElementById("buscar").value);
 
-if(q === ""){
+if(busquedaActual === ""){
 mostrar(datos);
 return;
 }
 
-const filtrados = datos.filter(x => {
+const filtrados = datos.filter(x=>{
 
-const texto = `
+const combinado = `
 ${x.grupo}
 ${x.tipo}
 ${x.cedula}
@@ -287,7 +307,7 @@ ${x.hora}
 ${x.fecha}
 `.toLowerCase();
 
-return texto.includes(q);
+return combinado.includes(busquedaActual);
 
 });
 

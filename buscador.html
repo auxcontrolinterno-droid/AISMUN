@@ -1,10 +1,11 @@
+<!-- buscador.html (ACTUALIZADO CON NUEVO LOGO) -->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Buscador AISMUN</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
@@ -28,7 +29,7 @@ margin-bottom:18px;
 .header img{
 width:100%;
 max-width:520px;
-height:auto;
+border-radius:18px;
 }
 
 .container{
@@ -51,7 +52,6 @@ margin-bottom:6px;
 .sub{
 text-align:center;
 color:#666;
-font-size:14px;
 margin-bottom:18px;
 }
 
@@ -64,12 +64,6 @@ border-radius:18px;
 border:2px solid #0b3d91;
 outline:none;
 margin-bottom:18px;
-background:#f8fbff;
-}
-
-#buscar::placeholder{
-font-size:18px;
-color:#777;
 }
 
 .cards{
@@ -102,7 +96,6 @@ background:#fff;
 padding:10px;
 border-radius:12px;
 border:1px solid #edf1f7;
-word-break:break-word;
 }
 
 .label{
@@ -113,33 +106,8 @@ margin-bottom:4px;
 text-transform:uppercase;
 }
 
-.total{
-margin-top:18px;
-text-align:center;
-font-size:14px;
-font-weight:700;
-color:#555;
-}
-
 @media(max-width:700px){
-
-.grid{
-grid-template-columns:1fr;
-}
-
-#buscar{
-font-size:19px;
-padding:18px;
-}
-
-h1{
-font-size:24px;
-}
-
-.header img{
-max-width:100%;
-}
-
+.grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -147,111 +115,56 @@ max-width:100%;
 <body>
 
 <div class="header">
-<img src="https://i.ibb.co/7N0tXh7/logo-aismun.png">
+<img src="https://i.ibb.co/xKtvSvZ7/IMG-20260417-WA0011.jpg">
 </div>
 
 <div class="container">
 
 <h1>BUSCADOR AISMUN</h1>
-<div class="sub">Buscar por nombre, cédula, colegio, placa o bus</div>
+<div class="sub">Buscar por nombre, cédula, colegio o placa</div>
 
-<input
-id="buscar"
-type="text"
-placeholder="Buscar ahora..."
-oninput="filtrar()"
-autocomplete="off">
+<input id="buscar" placeholder="Buscar..." oninput="filtrar()">
 
 <div id="resultados" class="cards"></div>
-<div id="total" class="total"></div>
 
 </div>
 
 <script>
+const SHEET_URL="https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAifzyypT1aHaX5RcTwOTPjwuA/gviz/tq?tqx=out:json";
 
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAifzyypT1aHaX5RcTwOTPjwuA/gviz/tq?tqx=out:json";
-
-let datos = [];
-let busquedaActual = "";
-
-function texto(v){
-return String(v || "").toLowerCase().trim();
-}
-
-function formatearHora(valor){
-
-if(typeof valor === "string" && valor.includes("Date(")){
-
-const nums = valor.match(/\d+/g);
-
-if(nums && nums.length >= 6){
-
-let h = nums[3].padStart(2,"0");
-let m = nums[4].padStart(2,"0");
-let s = nums[5].padStart(2,"0");
-
-return h + ":" + m + ":" + s;
-}
-
-}
-
-return valor || "";
-
-}
+let datos=[];
 
 async function cargar(){
 
-try{
+const res=await fetch(SHEET_URL);
+const txt=await res.text();
+const json=JSON.parse(txt.substring(47).slice(0,-2));
 
-const res = await fetch(SHEET_URL);
-const raw = await res.text();
-const json = JSON.parse(raw.substring(47).slice(0,-2));
+datos=json.table.rows.map(r=>{
 
-datos = json.table.rows.map(r=>{
-
-const c = (r.c || []).map(x => x ? x.v : "");
+const c=(r.c||[]).map(x=>x?x.v:"");
 
 return{
-grupo:c[0] || "",
-tipo:c[1] || "",
-cedula:c[2] || "",
-nombre:c[3] || "",
-telefono:c[4] || "",
-emergencia:c[5] || "",
-institucion:c[6] || "",
-vehiculo:c[7] || "",
-placa:c[8] || "",
-bus:c[9] || "",
-placaBus:c[10] || "",
-cantidad:c[11] || "",
-hora:formatearHora(c[12]),
-fecha:c[13] || ""
+cedula:c[2]||"",
+nombre:c[3]||"",
+institucion:c[6]||"",
+placa:c[8]||"",
+hora:c[12]||""
 };
 
 });
 
-if(busquedaActual !== ""){
-filtrar();
-}else{
 mostrar(datos);
-}
-
-}catch(e){
-
-document.getElementById("resultados").innerHTML =
-"<div style='text-align:center;color:red;font-weight:700;'>Error cargando datos</div>";
-
-}
 
 }
 
 function mostrar(lista){
 
-let html = "";
+let html="";
 
 lista.forEach(x=>{
 
-html += `
+html+=`
 <div class="card">
 
 <div class="nombre">${x.nombre}</div>
@@ -274,71 +187,38 @@ ${x.placa}
 </div>
 
 <div class="item">
-<div class="label">Placa Bus</div>
-${x.placaBus}
-</div>
-
-<div class="item">
-<div class="label">Tipo</div>
-${x.tipo}
-</div>
-
-<div class="item">
 <div class="label">Hora</div>
 ${x.hora}
 </div>
 
 </div>
-
 </div>
 `;
 
 });
 
-document.getElementById("resultados").innerHTML = html;
-document.getElementById("total").innerText = "Total resultados: " + lista.length;
+document.getElementById("resultados").innerHTML=html;
 
 }
 
 function filtrar(){
 
-busquedaActual = texto(document.getElementById("buscar").value);
+let q=document.getElementById("buscar").value.toLowerCase();
 
-if(busquedaActual === ""){
-mostrar(datos);
-return;
-}
+let f=datos.filter(x=>
 
-const filtrados = datos.filter(x=>{
+x.nombre.toLowerCase().includes(q)||
+x.cedula.toLowerCase().includes(q)||
+x.institucion.toLowerCase().includes(q)||
+x.placa.toLowerCase().includes(q)
 
-const combinado = `
-${x.grupo}
-${x.tipo}
-${x.cedula}
-${x.nombre}
-${x.telefono}
-${x.emergencia}
-${x.institucion}
-${x.vehiculo}
-${x.placa}
-${x.bus}
-${x.placaBus}
-${x.cantidad}
-${x.hora}
-${x.fecha}
-`.toLowerCase();
+);
 
-return combinado.includes(busquedaActual);
-
-});
-
-mostrar(filtrados);
+mostrar(f);
 
 }
 
 cargar();
-setInterval(cargar,10000);
-
 </script>
 
 </body>

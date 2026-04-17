@@ -30,7 +30,7 @@ max-width:340px;
 .container{
 background:#fff;
 width:92%;
-max-width:520px;
+max-width:540px;
 margin:25px auto;
 padding:25px;
 border-radius:20px;
@@ -56,7 +56,7 @@ color:#555;
 
 label{
 font-size:13px;
-font-weight:600;
+font-weight:700;
 display:block;
 margin-bottom:6px;
 margin-top:12px;
@@ -153,10 +153,19 @@ display:none;
 <label>Nombre completo del responsable</label>
 <input id="nombre">
 
-<label>Teléfono del responsable</label>
+<div class="row">
+<div>
+<label>Teléfono principal</label>
 <input id="telefono">
+</div>
 
-<label>Institución</label>
+<div>
+<label>Número de emergencia</label>
+<input id="emergencia">
+</div>
+</div>
+
+<label>Institución / Colegio</label>
 <input id="institucion">
 
 <label>¿Viene en vehículo?</label>
@@ -216,11 +225,12 @@ async function enviar(){
 const cedula = document.getElementById("cedula").value.trim();
 const nombre = document.getElementById("nombre").value.trim();
 const telefono = document.getElementById("telefono").value.trim();
+const emergencia = document.getElementById("emergencia").value.trim();
 const institucion = document.getElementById("institucion").value.trim();
 const vehiculo = document.getElementById("vehiculo").value;
 const placa = document.getElementById("placa").value.trim();
 
-if(!cedula || !nombre || !telefono || !institucion){
+if(!cedula || !nombre || !telefono || !emergencia || !institucion){
 alert("Complete todos los campos principales");
 return;
 }
@@ -234,6 +244,7 @@ tipo:"Responsable",
 cedula,
 nombre,
 telefono,
+emergencia,
 institucion,
 vehiculo,
 placa
@@ -254,6 +265,7 @@ tipo:"Acompañante",
 cedula:c,
 nombre:n,
 telefono:"",
+emergencia:"",
 institucion,
 vehiculo,
 placa

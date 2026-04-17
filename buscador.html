@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AISMUN</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+font-family:'Inter',sans-serif;
+background:linear-gradient(135deg,#e9eef5,#dfe7f1);
+text-align:center;
+}
+
+.header{
+background:#fff;
+padding:18px 0;
+border-bottom:2px solid #0b3d91;
+box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+
+.header img{
+width:85%;
+max-width:340px;
+}
+
+.container{
+background:#fff;
+width:92%;
+max-width:540px;
+margin:25px auto;
+padding:25px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+text-align:left;
+}
+
+h1{
+margin:0;
+color:#0b3d91;
+font-size:32px;
+font-weight:800;
+text-align:center;
+}
+
+.sub{
+text-align:center;
+font-size:14px;
+margin-top:6px;
+margin-bottom:22px;
+color:#555;
+}
+
+label{
+font-size:13px;
+font-weight:700;
+display:block;
+margin-bottom:6px;
+margin-top:12px;
+}
+
+input,select{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+box-sizing:border-box;
+font-size:14px;
+}
+
+input:focus,select:focus{
+outline:none;
+border-color:#0b3d91;
+box-shadow:0 0 0 2px rgba(11,61,145,.08);
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-weight:700;
+font-size:15px;
+margin-top:14px;
+}
+
+.blue{
+background:#0b3d91;
+color:#fff;
+}
+
+.blue:hover{
+background:#092f6f;
+}
+
+.gray{
+background:#eef2f8;
+color:#0b3d91;
+}
+
+.persona{
+border:1px solid #e4e7ec;
+padding:15px;
+border-radius:14px;
+margin-top:14px;
+background:#fafbfd;
+}
+
+.mini{
+font-size:12px;
+color:#666;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.ok{
+text-align:center;
+padding:18px;
+font-weight:700;
+color:#0b3d91;
+}
+
+.hidden{
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<img src="https://i.imgur.com/OB279U8.jpeg">
+</div>
+
+<div class="container">
+
+<h1>AISMUN</h1>
+<div class="sub">Bienvenidos a AISMUN</div>
+
+<label>Número de cédula del responsable</label>
+<input id="cedula">
+
+<label>Nombre completo del responsable</label>
+<input id="nombre">
+
+<div class="row">
+<div>
+<label>Teléfono principal</label>
+<input id="telefono">
+</div>
+
+<div>
+<label>Número de emergencia</label>
+<input id="emergencia">
+</div>
+</div>
+
+<label>Institución / Colegio</label>
+<input id="institucion">
+
+<label>¿Viene en vehículo?</label>
+<select id="vehiculo" onchange="togglePlaca()">
+<option value="NO">No</option>
+<option value="SI">Sí</option>
+</select>
+
+<div id="placaBox" class="hidden">
+<label>Placa del vehículo</label>
+<input id="placa">
+</div>
+
+<div id="acompanantes"></div>
+
+<button class="btn gray" onclick="agregarPersona()">➕ Agregar acompañante</button>
+
+<button class="btn blue" onclick="enviar()">Registrar ingreso</button>
+
+<div id="msg"></div>
+
+</div>
+
+<script>
+
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycby-V1uzBGMZ5fIXwRZpKw7ceyMkZ9EJ-W2nEbv8e4WpQNZLedDR2XE4_V840mfJrzLbyQ/exec";
+
+let contador = 0;
+
+function togglePlaca(){
+const v = document.getElementById("vehiculo").value;
+document.getElementById("placaBox").classList.toggle("hidden", v !== "SI");
+}
+
+function agregarPersona(){
+
+contador++;
+
+const div = document.createElement("div");
+div.className = "persona";
+
+div.innerHTML = `
+<div class="mini">Acompañante #${contador}</div>
+
+<label>Nombre completo</label>
+<input class="anombre">
+
+<label>Número de cédula</label>
+<input class="acedula">
+`;
+
+document.getElementById("acompanantes").appendChild(div);
+}
+
+async function enviar(){
+
+const cedula = document.getElementById("cedula").value.trim();
+const nombre = document.getElementById("nombre").value.trim();
+const telefono = document.getElementById("telefono").value.trim();
+const emergencia = document.getElementById("emergencia").value.trim();
+const institucion = document.getElementById("institucion").value.trim();
+const vehiculo = document.getElementById("vehiculo").value;
+const placa = document.getElementById("placa").value.trim();
+
+if(!cedula || !nombre || !telefono || !emergencia || !institucion){
+alert("Complete todos los campos principales");
+return;
+}
+
+const grupo = "GRP-" + Date.now();
+
+let personas = [];
+
+personas.push({
+tipo:"Responsable",
+cedula,
+nombre,
+telefono,
+emergencia,
+institucion,
+vehiculo,
+placa
+});
+
+const nombres = document.querySelectorAll(".anombre");
+const cedulas = document.querySelectorAll(".acedula");
+
+for(let i=0;i<nombres.length;i++){
+
+const n = nombres[i].value.trim();
+const c = cedulas[i].value.trim();
+
+if(n && c){
+
+personas.push({
+tipo:"Acompañante",
+cedula:c,
+nombre:n,
+telefono:"",
+emergencia:"",
+institucion,
+vehiculo,
+placa
+});
+
+}
+
+}
+
+document.getElementById("msg").innerHTML = "<div class='ok'>Registrando...</div>";
+
+await fetch(URL_SCRIPT,{
+method:"POST",
+body:JSON.stringify({
+grupo,
+personas
+})
+});
+
+document.getElementById("msg").innerHTML = "<div class='ok'>✅ Registro exitoso</div>";
+
+setTimeout(()=>{
+location.reload();
+},1500);
+
+}
+
+</script>
+
+</body>
+</html>

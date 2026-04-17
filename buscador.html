@@ -8,11 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
 font-family:'Inter',sans-serif;
@@ -70,13 +66,8 @@ margin-bottom:18px;
 background:#f8fbff;
 }
 
-#buscar:focus{
-box-shadow:0 0 0 4px rgba(11,61,145,.10);
-}
-
 #buscar::placeholder{
 font-size:18px;
-font-weight:600;
 color:#777;
 }
 
@@ -97,7 +88,6 @@ font-size:18px;
 font-weight:800;
 color:#0b3d91;
 margin-bottom:10px;
-word-break:break-word;
 }
 
 .grid{
@@ -118,8 +108,8 @@ word-break:break-word;
 font-size:11px;
 font-weight:800;
 color:#666;
-text-transform:uppercase;
 margin-bottom:4px;
+text-transform:uppercase;
 }
 
 .total{
@@ -131,24 +121,9 @@ color:#555;
 }
 
 @media(max-width:700px){
-
-h1{
-font-size:24px;
-}
-
-#buscar{
-padding:18px;
-font-size:20px;
-}
-
-.grid{
-grid-template-columns:1fr;
-}
-
-.nombre{
-font-size:17px;
-}
-
+.grid{grid-template-columns:1fr;}
+#buscar{font-size:19px;padding:18px;}
+h1{font-size:24px;}
 }
 </style>
 </head>
@@ -162,12 +137,17 @@ font-size:17px;
 <div class="container">
 
 <h1>BUSCADOR AISMUN</h1>
-<div class="sub">Buscar por nombre, cédula, colegio o placa</div>
+<div class="sub">Buscar por nombre, cédula, colegio, placa o bus</div>
 
-<input id="buscar" placeholder="Buscar ahora..." onkeyup="filtrar()">
+<input 
+id="buscar" 
+type="text"
+placeholder="Buscar ahora..."
+oninput="filtrar()"
+autocomplete="off"
+>
 
 <div id="resultados" class="cards"></div>
-
 <div id="total" class="total"></div>
 
 </div>
@@ -178,43 +158,47 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAif
 
 let datos = [];
 
+function txt(v){
+return String(v || "").toLowerCase().trim();
+}
+
 async function cargar(){
 
 try{
 
 const res = await fetch(SHEET_URL);
-const txt = await res.text();
-const json = JSON.parse(txt.substring(47).slice(0,-2));
+const raw = await res.text();
+const json = JSON.parse(raw.substring(47).slice(0,-2));
 
 datos = json.table.rows.map(r=>{
 
 const c = (r.c || []).map(x => x ? x.v : "");
 
 return{
-grupo:c[0] || "",
-tipo:c[1] || "",
-cedula:c[2] || "",
-nombre:c[3] || "",
-telefono:c[4] || "",
-emergencia:c[5] || "",
-institucion:c[6] || "",
-vehiculo:c[7] || "",
-placa:c[8] || "",
-bus:c[9] || "",
-placaBus:c[10] || "",
-cantidad:c[11] || "",
-hora:c[12] || "",
-fecha:c[13] || ""
+grupo: String(c[0] || ""),
+tipo: String(c[1] || ""),
+cedula: String(c[2] || ""),
+nombre: String(c[3] || ""),
+telefono: String(c[4] || ""),
+emergencia: String(c[5] || ""),
+institucion: String(c[6] || ""),
+vehiculo: String(c[7] || ""),
+placa: String(c[8] || ""),
+bus: String(c[9] || ""),
+placaBus: String(c[10] || ""),
+cantidad: String(c[11] || ""),
+hora: String(c[12] || ""),
+fecha: String(c[13] || "")
 };
 
 });
 
 mostrar(datos);
 
-}catch(error){
+}catch(e){
 
 document.getElementById("resultados").innerHTML =
-"<div style='text-align:center;color:red;font-weight:700;'>Error cargando base de datos</div>";
+"<div style='text-align:center;color:red;font-weight:700;'>Error cargando datos</div>";
 
 }
 
@@ -239,11 +223,6 @@ ${x.cedula}
 </div>
 
 <div class="item">
-<div class="label">Tipo</div>
-${x.tipo}
-</div>
-
-<div class="item">
 <div class="label">Institución</div>
 ${x.institucion}
 </div>
@@ -254,18 +233,13 @@ ${x.placa}
 </div>
 
 <div class="item">
-<div class="label">Bus</div>
-${x.bus}
-</div>
-
-<div class="item">
 <div class="label">Placa Bus</div>
 ${x.placaBus}
 </div>
 
 <div class="item">
-<div class="label">Alumnos</div>
-${x.cantidad}
+<div class="label">Tipo</div>
+${x.tipo}
 </div>
 
 <div class="item">
@@ -287,24 +261,41 @@ document.getElementById("total").innerText = "Total resultados: " + lista.length
 
 function filtrar(){
 
-const t = document.getElementById("buscar").value.toLowerCase();
+const q = txt(document.getElementById("buscar").value);
 
-const filtrados = datos.filter(x =>
+if(q === ""){
+mostrar(datos);
+return;
+}
 
-x.nombre.toLowerCase().includes(t) ||
-x.cedula.toLowerCase().includes(t) ||
-x.institucion.toLowerCase().includes(t) ||
-x.placa.toLowerCase().includes(t) ||
-x.placaBus.toLowerCase().includes(t)
+const filtrados = datos.filter(x => {
 
-);
+const texto = `
+${x.grupo}
+${x.tipo}
+${x.cedula}
+${x.nombre}
+${x.telefono}
+${x.emergencia}
+${x.institucion}
+${x.vehiculo}
+${x.placa}
+${x.bus}
+${x.placaBus}
+${x.cantidad}
+${x.hora}
+${x.fecha}
+`.toLowerCase();
+
+return texto.includes(q);
+
+});
 
 mostrar(filtrados);
 
 }
 
 cargar();
-
 setInterval(cargar,10000);
 
 </script>

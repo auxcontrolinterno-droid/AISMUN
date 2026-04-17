@@ -18,16 +18,17 @@ padding:15px;
 
 .header{
 background:#fff;
-padding:18px;
-border-radius:20px;
+padding:22px;
+border-radius:22px;
 text-align:center;
 box-shadow:0 8px 20px rgba(0,0,0,.06);
 margin-bottom:18px;
 }
 
 .header img{
-width:90%;
-max-width:340px;
+width:100%;
+max-width:520px;
+height:auto;
 }
 
 .container{
@@ -64,6 +65,11 @@ border:2px solid #0b3d91;
 outline:none;
 margin-bottom:18px;
 background:#f8fbff;
+}
+
+#buscar::placeholder{
+font-size:18px;
+color:#777;
 }
 
 .cards{
@@ -116,9 +122,24 @@ color:#555;
 }
 
 @media(max-width:700px){
-.grid{grid-template-columns:1fr;}
-#buscar{font-size:19px;padding:18px;}
-h1{font-size:24px;}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+#buscar{
+font-size:19px;
+padding:18px;
+}
+
+h1{
+font-size:24px;
+}
+
+.header img{
+max-width:100%;
+}
+
 }
 </style>
 </head>
@@ -126,7 +147,7 @@ h1{font-size:24px;}
 <body>
 
 <div class="header">
-<img src="https://i.imgur.com/OB279U8.jpeg">
+<img src="https://i.ibb.co/7N0tXh7/logo-aismun.png">
 </div>
 
 <div class="container">

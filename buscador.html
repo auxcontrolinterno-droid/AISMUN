@@ -1,208 +1,45 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buscador AISMUN</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- SOLO CAMBIA EL CSS DEL INPUT POR ESTE -->
 
 <style>
-body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:linear-gradient(135deg,#e9eef5,#dfe7f1);
-text-align:center;
-}
-
-.header{
-background:#fff;
-padding:18px 0;
-border-bottom:2px solid #0b3d91;
-box-shadow:0 2px 8px rgba(0,0,0,.06);
-}
-
-.header img{
-width:85%;
-max-width:340px;
-}
-
-.container{
-background:#fff;
-width:94%;
-max-width:850px;
-margin:25px auto;
-padding:25px;
-border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,.08);
-}
-
-h1{
-margin:0;
-font-size:30px;
-font-weight:800;
-color:#0b3d91;
-}
-
-.sub{
-font-size:14px;
-color:#555;
-margin-top:6px;
-margin-bottom:20px;
-}
 
 input{
 width:100%;
-padding:14px;
-border-radius:12px;
-border:1px solid #ccc;
+padding:20px;
+border-radius:18px;
+border:2px solid #0b3d91;
 box-sizing:border-box;
-font-size:15px;
-margin-bottom:18px;
+font-size:20px;
+font-weight:700;
+margin-bottom:22px;
+outline:none;
+transition:0.2s;
+background:#f8fbff;
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-font-size:13px;
+input:focus{
+border-color:#092f6f;
+box-shadow:0 0 0 4px rgba(11,61,145,.12);
+transform:scale(1.01);
 }
 
-th{
-background:#0b3d91;
-color:#fff;
-padding:10px;
+input::placeholder{
+font-size:18px;
+font-weight:600;
+color:#7a7a7a;
 }
 
-td{
-padding:10px;
-border-bottom:1px solid #eee;
-text-align:left;
+@media(max-width:600px){
+
+input{
+padding:18px;
+font-size:18px;
+border-radius:16px;
 }
 
-tr:hover{
-background:#f8faff;
+input::placeholder{
+font-size:16px;
 }
 
-.small{
-font-size:12px;
-color:#666;
-margin-top:10px;
 }
+
 </style>
-</head>
-
-<body>
-
-<div class="header">
-<img src="https://i.imgur.com/OB279U8.jpeg">
-</div>
-
-<div class="container">
-
-<h1>BUSCADOR AISMUN</h1>
-<div class="sub">Buscar por nombre, cédula, colegio o placa</div>
-
-<input id="buscar" placeholder="Escriba para buscar..." onkeyup="filtrar()">
-
-<table id="tabla">
-<thead>
-<tr>
-<th>Grupo</th>
-<th>Tipo</th>
-<th>Cédula</th>
-<th>Nombre</th>
-<th>Institución</th>
-<th>Placa</th>
-<th>Hora</th>
-</tr>
-</thead>
-<tbody id="resultados"></tbody>
-</table>
-
-<div class="small">Actualización en tiempo real</div>
-
-</div>
-
-<script>
-
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1M3KycbxkWjSfmu55qwAifzyypT1aHaX5RcTwOTPjwuA/gviz/tq?tqx=out:json";
-
-let datos = [];
-
-async function cargar(){
-
-const res = await fetch(SHEET_URL);
-const txt = await res.text();
-const json = JSON.parse(txt.substring(47).slice(0,-2));
-
-datos = json.table.rows.map(r=>{
-
-const c = (r.c || []).map(x => x ? x.v : "");
-
-return {
-grupo:c[0],
-tipo:c[1],
-cedula:c[2],
-nombre:c[3],
-institucion:c[6],
-placa:c[8],
-hora:c[9]
-};
-
-});
-
-mostrar(datos);
-
-}
-
-function mostrar(lista){
-
-let html = "";
-
-lista.forEach(x=>{
-
-html += `
-<tr>
-<td>${x.grupo}</td>
-<td>${x.tipo}</td>
-<td>${x.cedula}</td>
-<td>${x.nombre}</td>
-<td>${x.institucion}</td>
-<td>${x.placa}</td>
-<td>${x.hora}</td>
-</tr>
-`;
-
-});
-
-document.getElementById("resultados").innerHTML = html;
-
-}
-
-function filtrar(){
-
-const t = document.getElementById("buscar").value.toLowerCase();
-
-const filtrados = datos.filter(x =>
-
-String(x.grupo).toLowerCase().includes(t) ||
-String(x.tipo).toLowerCase().includes(t) ||
-String(x.cedula).toLowerCase().includes(t) ||
-String(x.nombre).toLowerCase().includes(t) ||
-String(x.institucion).toLowerCase().includes(t) ||
-String(x.placa).toLowerCase().includes(t)
-
-);
-
-mostrar(filtrados);
-
-}
-
-cargar();
-
-setInterval(cargar,10000);
-
-</script>
-
-</body>
-</html>

@@ -86,7 +86,7 @@ cursor:pointer;
 
 <!-- 🔥 TARJETAS -->
 <div class="cards">
-  <div class="card"><h2 id="total">0</h2><p>Total registros</p></div>
+  <div class="card"><h2 id="total">0</h2><p>Total personas únicas</p></div>
   <div class="card"><h2 id="vehiculos">0</h2><p>Vehículos</p></div>
   <div class="card"><h2 id="buses">0</h2><p>Buses</p></div>
   <div class="card"><h2 id="alumnos">0</h2><p>Total alumnos</p></div>
@@ -119,6 +119,9 @@ try{
 let res = await fetch(URL_SCRIPT);
 let data = await res.json();
 
+// 🔥 SET PARA EVITAR DUPLICADOS
+let vistos = new Set();
+
 // 🔥 CONTADORES
 let total = 0;
 let vehiculos = 0;
@@ -129,30 +132,38 @@ let html = "";
 
 data.forEach(p => {
 
-total++;
+  // 🔑 CLAVE ÚNICA (CEDULA o TELEFONO como fallback)
+  let key = (p.Cedula || p.Telefono || p.Nombre || "").toString().trim().toLowerCase();
 
-// Vehículos
-if ((p.Vehiculo || "").toUpperCase() === "SI") vehiculos++;
+  // 🚨 SI YA EXISTE, SE SALTA
+  if (vistos.has(key)) return;
 
-// Buses
-if ((p.Bus || "").toUpperCase() === "SI") buses++;
+  vistos.add(key);
 
-// Alumnos
-if (p.CantidadAlumnos) {
-alumnos += Number(p.CantidadAlumnos) || 0;
-}
+  total++;
 
-// Tabla
-html += `
-<tr>
-<td>${p.Nombre || ""}</td>
-<td>${p.Telefono || ""}</td>
-<td>${p.Institucion || ""}</td>
-<td>${p.Vehiculo || ""}</td>
-<td>${p.Bus || ""}</td>
-<td>${p.Placa || p.PlacaBus || ""}</td>
-</tr>
-`;
+  // Vehículos
+  if ((p.Vehiculo || "").toUpperCase() === "SI") vehiculos++;
+
+  // Buses
+  if ((p.Bus || "").toUpperCase() === "SI") buses++;
+
+  // Alumnos
+  if (p.CantidadAlumnos) {
+    alumnos += Number(p.CantidadAlumnos) || 0;
+  }
+
+  // Tabla
+  html += `
+  <tr>
+    <td>${p.Nombre || ""}</td>
+    <td>${p.Telefono || ""}</td>
+    <td>${p.Institucion || ""}</td>
+    <td>${p.Vehiculo || ""}</td>
+    <td>${p.Bus || ""}</td>
+    <td>${p.Placa || p.PlacaBus || ""}</td>
+  </tr>
+  `;
 
 });
 
@@ -162,17 +173,17 @@ document.getElementById("vehiculos").innerText = vehiculos;
 document.getElementById("buses").innerText = buses;
 document.getElementById("alumnos").innerText = alumnos;
 
-// 🔥 TABLA
+// 🔥 TABLA SIN DUPLICADOS
 document.getElementById("tabla").innerHTML = html;
 
 }catch(err){
-console.error("Error cargando datos:", err);
-alert("Error al cargar datos del servidor");
+console.error(err);
+alert("Error cargando datos");
 }
 
 }
 
-// carga inicial
+// inicial
 cargar();
 
 </script>

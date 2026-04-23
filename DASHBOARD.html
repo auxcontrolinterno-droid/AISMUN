@@ -38,11 +38,13 @@ box-shadow:0 5px 15px rgba(0,0,0,.08);
 .card h2{
 color:#0b3d91;
 font-size:22px;
+margin:0;
 }
 
 .card p{
 font-size:13px;
 color:#666;
+margin:5px 0 0;
 }
 
 table{
@@ -81,88 +83,98 @@ cursor:pointer;
 <body>
 
 <h1>Dashboard AISMUN</h1>
-let total = 0;
-let vehiculos = 0;
-let buses = 0;
-let alumnos = 0;
 
-data.forEach(p => {
-
-  total++;
-
-  if (p.Vehiculo === "SI") vehiculos++;
-  if (p.Bus === "SI") buses++;
-
-  if (p.CantidadAlumnos) {
-    alumnos += Number(p.CantidadAlumnos);
-  }
-
-});
+<!-- 🔥 TARJETAS -->
+<div class="cards">
+  <div class="card"><h2 id="total">0</h2><p>Total registros</p></div>
+  <div class="card"><h2 id="vehiculos">0</h2><p>Vehículos</p></div>
+  <div class="card"><h2 id="buses">0</h2><p>Buses</p></div>
+  <div class="card"><h2 id="alumnos">0</h2><p>Total alumnos</p></div>
+</div>
 
 <button class="btn" onclick="cargar()">🔄 Actualizar</button>
 
 <table>
 <thead>
 <tr>
-<th>Tipo</th>
 <th>Nombre</th>
-<th>Cédula</th>
+<th>Teléfono</th>
 <th>Institución</th>
 <th>Vehículo</th>
 <th>Bus</th>
+<th>Placa</th>
 </tr>
 </thead>
 <tbody id="tabla"></tbody>
 </table>
 
 <script>
+
 const URL_SCRIPT="https://script.google.com/macros/s/AKfycby-V1uzBGMZ5fIXwRZpKw7ceyMkZ9EJ-W2nEbv8e4WpQNZLedDR2XE4_V840mfJrzLbyQ/exec";
 
 async function cargar(){
 
-let res=await fetch(URL_SCRIPT);
-let data=await res.json();
+try{
 
-let total=0;
-let responsables=0;
-let acompanantes=0;
-let vehiculos=0;
-let buses=0;
+let res = await fetch(URL_SCRIPT);
+let data = await res.json();
 
-let html="";
+// 🔥 CONTADORES
+let total = 0;
+let vehiculos = 0;
+let buses = 0;
+let alumnos = 0;
 
-data.forEach(p=>{
+let html = "";
+
+data.forEach(p => {
 
 total++;
 
-if(p.tipo==="Responsable") responsables++;
-if(p.tipo==="Acompañante") acompanantes++;
-if(p.vehiculo==="SI") vehiculos++;
-if(p.bus==="SI") buses++;
+// Vehículos
+if ((p.Vehiculo || "").toUpperCase() === "SI") vehiculos++;
 
-html+=`
+// Buses
+if ((p.Bus || "").toUpperCase() === "SI") buses++;
+
+// Alumnos
+if (p.CantidadAlumnos) {
+alumnos += Number(p.CantidadAlumnos) || 0;
+}
+
+// Tabla
+html += `
 <tr>
-<td>Responsable</td>
-<td>${p.Nombre}</td>
-<td>${p.Telefono}</td>
-<td>${p.Institucion}</td>
-<td>${p.Vehiculo}</td>
-<td>${p.Bus}</td>
+<td>${p.Nombre || ""}</td>
+<td>${p.Telefono || ""}</td>
+<td>${p.Institucion || ""}</td>
+<td>${p.Vehiculo || ""}</td>
+<td>${p.Bus || ""}</td>
+<td>${p.Placa || p.PlacaBus || ""}</td>
 </tr>
 `;
 
 });
 
-document.getElementById("total").innerText=total;
-document.getElementById("responsables").innerText=responsables;
-document.getElementById("acompanantes").innerText=acompanantes;
-document.getElementById("vehiculos").innerText=vehiculos;
-document.getElementById("buses").innerText=buses;
+// 🔥 INYECTAR CONTADORES
+document.getElementById("total").innerText = total;
+document.getElementById("vehiculos").innerText = vehiculos;
+document.getElementById("buses").innerText = buses;
+document.getElementById("alumnos").innerText = alumnos;
 
-document.getElementById("tabla").innerHTML=html;
+// 🔥 TABLA
+document.getElementById("tabla").innerHTML = html;
+
+}catch(err){
+console.error("Error cargando datos:", err);
+alert("Error al cargar datos del servidor");
 }
 
+}
+
+// carga inicial
 cargar();
+
 </script>
 
 </body>

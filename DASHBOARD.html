@@ -81,14 +81,23 @@ cursor:pointer;
 <body>
 
 <h1>Dashboard AISMUN</h1>
+let total = 0;
+let vehiculos = 0;
+let buses = 0;
+let alumnos = 0;
 
-<div class="cards">
-<div class="card"><h2 id="total">0</h2><p>Total Personas</p></div>
-<div class="card"><h2 id="responsables">0</h2><p>Responsables</p></div>
-<div class="card"><h2 id="acompanantes">0</h2><p>Acompañantes</p></div>
-<div class="card"><h2 id="vehiculos">0</h2><p>Vehículos</p></div>
-<div class="card"><h2 id="buses">0</h2><p>Buses</p></div>
-</div>
+data.forEach(p => {
+
+  total++;
+
+  if (p.Vehiculo === "SI") vehiculos++;
+  if (p.Bus === "SI") buses++;
+
+  if (p.CantidadAlumnos) {
+    alumnos += Number(p.CantidadAlumnos);
+  }
+
+});
 
 <button class="btn" onclick="cargar()">🔄 Actualizar</button>
 
